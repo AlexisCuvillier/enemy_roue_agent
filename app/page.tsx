@@ -43,8 +43,29 @@ export default function Home() {
       
       const operators = selectedRole === 'attacker' ? ATTACKERS : DEFENDERS;
       const randomIndex = Math.floor(Math.random() * operators.length);
-      setSelectedOperator(operators[randomIndex]);
-      setImageError(false); // Reset l'erreur d'image
+      const selectedAgent = operators[randomIndex];
+      
+      // Précharger l'image avant d'afficher le nom (évite le scintillement)
+      const img = new Image();
+      img.src = `/agents/${selectedAgent}.avif`;
+      img.onload = () => {
+        setSelectedOperator(selectedAgent);
+        setImageError(false);
+      };
+      img.onerror = () => {
+        // Si .avif échoue, essayer .png
+        const imgPng = new Image();
+        imgPng.src = `/agents/${selectedAgent}.png`;
+        imgPng.onload = () => {
+          setSelectedOperator(selectedAgent);
+          setImageError(true); // Indique qu'on utilise png
+        };
+        imgPng.onerror = () => {
+          // Si les deux échouent, afficher quand même le nom
+          setSelectedOperator(selectedAgent);
+          setImageError(false);
+        };
+      };
     }, 3000);
   };
 
