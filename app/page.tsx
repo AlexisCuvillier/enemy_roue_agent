@@ -2,48 +2,61 @@
 
 import { useState } from 'react';
 
+const ATTACKERS = [
+  'Deimos', 'Brava', 'Ram', 'Sens', 'Grim', 'Flores', 'Osa',
+  'Iana', 'Ace', 'Zero', 'Gridlock', 'Nøkk', 'Amaru', 'Kali', 
+  'Lion', 'Finka', 'Maverick', 'Nomad', 'Jackal', 'Ying', 'Zofia', 
+  'Dokkaebi', 'Buck', 'Blackbeard', 'Capitão', 'Hibana', 'Sledge', 
+  'Thatcher', 'Ash', 'Thermite', 'Twitch', 'Montagne', 'Glaz', 
+  'Fuze', 'Blitz', 'IQ', 'Striker'
+];
+
+const DEFENDERS = [
+  'Sentry', 'Skopós', 'Fenrir', 'Tubarão', 'Thunderbird', 'Thorn', 
+  'Oryx', 'Melusi', 'Aruni', 'Mozzie', 'Warden', 'Goyo', 'Wamai', 
+  'Maestro', 'Alibi', 'Clash', 'Kaid', 'Mira', 'Lesion', 'Ela', 
+  'Vigil', 'Frost', 'Valkyrie', 'Caveira', 'Echo', 'Smoke', 'Mute', 
+  'Castle', 'Pulse', 'Doc', 'Rook', 'Kapkan', 'Tachanka', 'Jäger', 
+  'Bandit'
+];
+
 export default function Home() {
   const [selectedRole, setSelectedRole] = useState<'attacker' | 'defender'>('attacker');
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
+  const [selectedOperator, setSelectedOperator] = useState<string>('---');
 
   const handleSpin = () => {
     if (isSpinning) return;
     
     setIsSpinning(true);
+    setSelectedOperator('---');
     
     // Rotation aléatoire entre 1080 et 2160 degrés (3-6 tours)
     const randomRotation = 1080 + Math.random() * 1080;
     setRotation(prev => prev + randomRotation);
     
-    // Arrêter l'animation après 3 secondes
+    // Sélectionner un agent aléatoire après 3 secondes
     setTimeout(() => {
       setIsSpinning(false);
+      
+      const operators = selectedRole === 'attacker' ? ATTACKERS : DEFENDERS;
+      const randomIndex = Math.floor(Math.random() * operators.length);
+      setSelectedOperator(operators[randomIndex]);
     }, 3000);
   };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between px-8 py-4 border-b border-gray-800">
+      <header className="flex items-center px-8 py-4 border-b border-gray-800">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-white"></div>
+          <img src="/logo-mask.png" alt="Enemy Logo" className="w-10 h-10 object-contain" />
           <div className="text-white font-bold tracking-wider">
             <span className="text-gray-300">ENEMY</span>
             <span className="text-orange-500">OPS</span>
           </div>
         </div>
-        <nav className="flex items-center gap-6">
-          <button className="text-gray-400 hover:text-white transition-colors text-sm font-medium tracking-wide">
-            HISTORY
-          </button>
-          <button className="text-gray-400 hover:text-white transition-colors text-sm font-medium tracking-wide">
-            OPERATORS
-          </button>
-          <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded text-sm font-medium tracking-wide transition-colors">
-            LOGIN
-          </button>
-        </nav>
       </header>
 
       {/* Main Content */}
@@ -60,10 +73,13 @@ export default function Home() {
         {/* Role Toggle */}
         <div className="flex gap-2 mb-16">
           <button
-            onClick={() => setSelectedRole('attacker')}
+            onClick={() => {
+              setSelectedRole('attacker');
+              setSelectedOperator('---');
+            }}
             className={`px-6 py-2 rounded text-sm font-medium tracking-wide transition-all flex items-center gap-2 ${
               selectedRole === 'attacker'
-                ? 'bg-orange-500 text-white'
+                ? 'bg-blue-600 text-white'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
             }`}
           >
@@ -71,10 +87,13 @@ export default function Home() {
             ATTACKER
           </button>
           <button
-            onClick={() => setSelectedRole('defender')}
+            onClick={() => {
+              setSelectedRole('defender');
+              setSelectedOperator('---');
+            }}
             className={`px-6 py-2 rounded text-sm font-medium tracking-wide transition-all flex items-center gap-2 ${
               selectedRole === 'defender'
-                ? 'bg-orange-500 text-white'
+                ? 'bg-red-600 text-white'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
             }`}
           >
@@ -90,43 +109,54 @@ export default function Home() {
             <div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[20px] border-t-orange-500"></div>
           </div>
 
-          {/* Wheel */}
-          <div 
-            className="w-80 h-80 rounded-full relative overflow-hidden transition-transform duration-[3000ms] ease-out"
-            style={{ 
-              transform: `rotate(${rotation}deg)`,
-              transition: isSpinning ? 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none'
-            }}
-          >
-            {/* Segments */}
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-full h-full"
-                style={{
-                  transform: `rotate(${i * 45}deg)`,
-                  clipPath: 'polygon(50% 50%, 50% 0%, 100% 0%)',
-                  transformOrigin: '50% 50%',
-                }}
-              >
-                <div className={`w-full h-full ${i % 2 === 0 ? 'bg-[#1a2942]' : 'bg-[#243552]'}`}></div>
-              </div>
-            ))}
+          {/* Wheel Container */}
+          <div className="w-80 h-80 relative">
+            {/* Rotating Segments */}
+            <div 
+              className="w-full h-full rounded-full relative overflow-hidden transition-transform duration-[3000ms] ease-out"
+              style={{ 
+                transform: `rotate(${rotation}deg)`,
+                transition: isSpinning ? 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none'
+              }}
+            >
+              {/* Segments */}
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute w-full h-full"
+                  style={{
+                    transform: `rotate(${i * 45}deg)`,
+                    clipPath: 'polygon(50% 50%, 50% 0%, 100% 0%)',
+                    transformOrigin: '50% 50%',
+                  }}
+                >
+                  <div className={`w-full h-full ${i % 2 === 0 ? 'bg-[#1a2942]' : 'bg-[#243552]'}`}></div>
+                </div>
+              ))}
+            </div>
 
-            {/* Center Circle */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-orange-500 border-4 border-[#0a0a0a] flex items-center justify-center">
-              <div className="w-16 h-16 bg-white rounded"></div>
+            {/* Center Circle (Non-Rotating) - Pour la photo d'agent */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-orange-500 border-4 border-[#0a0a0a] flex items-center justify-center z-10">
+              <div className="w-16 h-16 bg-white rounded overflow-hidden flex items-center justify-center">
+                {selectedOperator !== '---' ? (
+                  <img 
+                    src={`/agents/${selectedOperator}.png`} 
+                    alt={selectedOperator}
+                    className="w-full h-full object-cover"
+                  />
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Selection Display */}
         <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg px-12 py-6 mb-8 min-w-[300px] text-center">
-          <div className="text-orange-500 text-sm font-medium tracking-widest mb-2">
-            AWAITING SELECTION
+          <div className={`text-sm font-medium tracking-widest mb-2 ${selectedOperator === '---' ? 'text-orange-500' : 'text-green-500'}`}>
+            {selectedOperator === '---' ? 'AWAITING SELECTION' : 'OPERATOR SELECTED'}
           </div>
-          <div className="text-white text-2xl font-bold tracking-wider">
-            ---
+          <div className="text-white text-2xl font-bold tracking-wider uppercase">
+            {selectedOperator}
           </div>
         </div>
 
@@ -157,9 +187,9 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="px-8 py-4 border-t border-gray-800 flex items-center justify-between">
-        <div className="text-gray-600 text-xs tracking-wide">
-          <div className="font-bold mb-1">ENEMY DESIGN</div>
-          <div>
+        <div className="flex flex-col gap-2">
+          <img src="/logo-text.png" alt="ENEMYN1" className="h-8 object-contain" style={{ filter: 'brightness(0.6)' }} />
+          <div className="text-gray-600 text-xs tracking-wide">
             CREATED BY <span className="text-gray-500">ENEMY N1</span> FOR <span className="text-gray-500">SIEGE.GG</span> TRADEMARK OF <span className="text-gray-500">UBISOFT ENTERTAINMENT</span>
           </div>
         </div>
