@@ -171,7 +171,7 @@ export default function Home() {
                 <img 
                   src={`/agents/${selectedOperator}.${imageError ? 'png' : 'avif'}`} 
                   alt={selectedOperator}
-                  className="w-16 h-16 rounded object-cover border-2 border-gray-700"
+                  className="w-16 h-16 rounded object-cover"
                 />
               )}
             </div>
