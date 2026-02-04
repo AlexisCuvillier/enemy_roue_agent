@@ -26,12 +26,14 @@ export default function Home() {
   const [rotation, setRotation] = useState(0);
   const [selectedOperator, setSelectedOperator] = useState<string>('---');
   const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleSpin = () => {
     if (isSpinning) return;
     
     setIsSpinning(true);
     setSelectedOperator('---');
+    setImageLoaded(false);
     
     // Rotation aléatoire entre 1080 et 2160 degrés (3-6 tours)
     const randomRotation = 1080 + Math.random() * 1080;
@@ -51,6 +53,7 @@ export default function Home() {
       img.onload = () => {
         setSelectedOperator(selectedAgent);
         setImageError(false);
+        setImageLoaded(true);
       };
       img.onerror = () => {
         // Si .avif échoue, essayer .png
@@ -59,11 +62,13 @@ export default function Home() {
         imgPng.onload = () => {
           setSelectedOperator(selectedAgent);
           setImageError(true); // Indique qu'on utilise png
+          setImageLoaded(true);
         };
         imgPng.onerror = () => {
-          // Si les deux échouent, afficher quand même le nom
+          // Si les deux échouent, afficher quand même le nom (sans image)
           setSelectedOperator(selectedAgent);
           setImageError(false);
+          setImageLoaded(false);
         };
       };
     }, 3000);
@@ -162,15 +167,12 @@ export default function Home() {
 
             {/* Center Circle (Non-Rotating) - Pour la photo d'agent */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-orange-500 border-4 border-[#0a0a0a] flex items-center justify-center z-10">
-              {selectedOperator !== '---' && (
-                <div className="w-16 h-16 bg-gray-800 rounded overflow-hidden flex items-center justify-center">
-                  <img 
-                    src={`/agents/${selectedOperator}.${imageError ? 'png' : 'avif'}`} 
-                    alt={selectedOperator}
-                    className="w-full h-full object-cover"
-                    onError={() => setImageError(true)}
-                  />
-                </div>
+              {selectedOperator !== '---' && imageLoaded && (
+                <img 
+                  src={`/agents/${selectedOperator}.${imageError ? 'png' : 'avif'}`} 
+                  alt={selectedOperator}
+                  className="w-16 h-16 rounded object-cover border-2 border-gray-700"
+                />
               )}
             </div>
           </div>
