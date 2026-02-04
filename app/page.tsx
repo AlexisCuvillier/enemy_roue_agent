@@ -8,7 +8,7 @@ const ATTACKERS = [
   'Lion', 'Finka', 'Maverick', 'Nomad', 'Jackal', 'Ying', 'Zofia', 
   'Dokkaebi', 'Buck', 'Blackbeard', 'Capitão', 'Hibana', 'Sledge', 
   'Thatcher', 'Ash', 'Thermite', 'Twitch', 'Montagne', 'Glaz', 
-  'Fuze', 'Blitz', 'IQ', 'Striker'
+  'Fuze', 'Blitz', 'IQ', 'Striker', 'Rauora'
 ];
 
 const DEFENDERS = [
@@ -17,7 +17,7 @@ const DEFENDERS = [
   'Maestro', 'Alibi', 'Clash', 'Kaid', 'Mira', 'Lesion', 'Ela', 
   'Vigil', 'Frost', 'Valkyrie', 'Caveira', 'Echo', 'Smoke', 'Mute', 
   'Castle', 'Pulse', 'Doc', 'Rook', 'Kapkan', 'Tachanka', 'Jäger', 
-  'Bandit'
+  'Bandit', 'Denari', 'Azami', 'Solis'
 ];
 
 export default function Home() {
@@ -25,6 +25,7 @@ export default function Home() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [selectedOperator, setSelectedOperator] = useState<string>('---');
+  const [imageError, setImageError] = useState(false);
 
   const handleSpin = () => {
     if (isSpinning) return;
@@ -43,6 +44,7 @@ export default function Home() {
       const operators = selectedRole === 'attacker' ? ATTACKERS : DEFENDERS;
       const randomIndex = Math.floor(Math.random() * operators.length);
       setSelectedOperator(operators[randomIndex]);
+      setImageError(false); // Reset l'erreur d'image
     }, 3000);
   };
 
@@ -76,6 +78,7 @@ export default function Home() {
             onClick={() => {
               setSelectedRole('attacker');
               setSelectedOperator('---');
+              setImageError(false);
             }}
             className={`px-6 py-2 rounded text-sm font-medium tracking-wide transition-all flex items-center gap-2 ${
               selectedRole === 'attacker'
@@ -90,6 +93,7 @@ export default function Home() {
             onClick={() => {
               setSelectedRole('defender');
               setSelectedOperator('---');
+              setImageError(false);
             }}
             className={`px-6 py-2 rounded text-sm font-medium tracking-wide transition-all flex items-center gap-2 ${
               selectedRole === 'defender'
@@ -137,12 +141,13 @@ export default function Home() {
 
             {/* Center Circle (Non-Rotating) - Pour la photo d'agent */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-orange-500 border-4 border-[#0a0a0a] flex items-center justify-center z-10">
-              <div className="w-16 h-16 bg-white rounded overflow-hidden flex items-center justify-center">
+              <div className="w-16 h-16 bg-gray-800 rounded overflow-hidden flex items-center justify-center">
                 {selectedOperator !== '---' ? (
                   <img 
-                    src={`/agents/${selectedOperator}.png`} 
+                    src={`/agents/${selectedOperator}.${imageError ? 'png' : 'avif'}`} 
                     alt={selectedOperator}
                     className="w-full h-full object-cover"
+                    onError={() => setImageError(true)}
                   />
                 ) : null}
               </div>
@@ -190,20 +195,8 @@ export default function Home() {
         <div className="flex flex-col gap-2">
           <img src="/logo-text.png" alt="ENEMYN1" className="h-8 object-contain" style={{ filter: 'brightness(0.6)' }} />
           <div className="text-gray-600 text-xs tracking-wide">
-            CREATED BY <span className="text-gray-500">ENEMY N1</span> FOR <span className="text-gray-500">SIEGE.GG</span> TRADEMARK OF <span className="text-gray-500">UBISOFT ENTERTAINMENT</span>
+            CREATED FOR <span className="text-gray-500">ENEMY N1</span> • FOR <span className="text-gray-500">SIEGE.GG</span> • TRADEMARK OF <span className="text-gray-500">UBISOFT ENTERTAINMENT</span>
           </div>
-        </div>
-        <div className="flex gap-3">
-          <button className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded flex items-center justify-center transition-colors">
-            <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
-            </svg>
-          </button>
-          <button className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded flex items-center justify-center transition-colors">
-            <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-            </svg>
-          </button>
         </div>
       </footer>
     </div>
